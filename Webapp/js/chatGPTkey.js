@@ -1,1 +1,1 @@
-const OPENAI_API_KEY = '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'; // never share this or publish online!
+const OPENAI_API_KEY = ''; // never share this or publish online!
