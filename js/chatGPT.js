@@ -4,15 +4,15 @@
 // check this for propoer formating of responses in json format- https://platform.openai.com/docs/guides/gpt/chat-completions-api c
 
 let txtOutputVal = "";
-let sUrl = "https://api.openai.com/v1/chat/completions" // gpt-4 is "https://api.openai.com/v1/completions";
-let sModel = "gpt-4-turbo";
+let sUrl = "https://api.openai.com/v1/chat/completions" 
+let sModel = "gpt-3.5-turbo";
 
 
 function setupChatGPTFunctions() {
 
 }
 
-function sendChatGPT(persona, sQuestion, role, funtionName) {
+function sendChatGPT(sQuestion, role, funtionName) {
 
 	return new Promise(function (resolve, reject) {
 		let returnObject = {
@@ -80,7 +80,7 @@ function sendChatGPT(persona, sQuestion, role, funtionName) {
 								let formatedValue = '{\"' + functionReturnObject.description + '\": "' + functionReturnObject.value + '"}'
 								console.log(functionReturnObject)
 								// we always need to send the value back to chatGPT
-								returnObject.promise = sendChatGPT(persona.conversationProtocal, formatedValue, 'function', functionName)
+								returnObject.promise = sendChatGPT(formatedValue, 'function', functionName)
 								if (functionReturnObject.description == "Error") {
 									returnObject.message = "function_call with error:" + functionReturnObject.value;
 									returnObject.role = "error"
@@ -109,7 +109,7 @@ function sendChatGPT(persona, sQuestion, role, funtionName) {
 								let formatedValue = '{\"' + functionReturnObject.description + '\": "' + functionReturnObject.value + '"}'
 								console.log(functionReturnObject)
 								// we always need to send the value back to chatGPT
-								returnObject.promise = sendChatGPT(persona.conversationProtocal,formatedValue, 'function', functionName)
+								returnObject.promise = sendChatGPT(formatedValue, 'function', functionName)
 								if (functionReturnObject.description == "Error") {
 									returnObject.message = "function_call with error:" + functionReturnObject.value;
 									returnObject.role = "error"
@@ -134,7 +134,7 @@ function sendChatGPT(persona, sQuestion, role, funtionName) {
 						console.log("success")
 						returnObject.message = s
 						// add the AI response to the protocol
-						persona.conversationProtocal.push({
+						conversationProtocal.push({
 							"role": "assistant",
 							"content": s
 						});
@@ -147,47 +147,38 @@ function sendChatGPT(persona, sQuestion, role, funtionName) {
 		let iMaxTokens = 2048;
 		let sUserId = "1";
 
-		console.log(persona.conversationProtocal);
+		console.log(conversationProtocal);
 		let data = {
 			model: sModel,
 			max_tokens: iMaxTokens,
 			user: sUserId,
-			temperature: persona.dTemperature,
-			frequency_penalty: persona.frequency_penalty, //Number between -2.0 and 2.0  
+			temperature: dTemperature,
+			frequency_penalty: frequency_penalty, //Number between -2.0 and 2.0  
 			//Positive value decrease the model's likelihood 
 			//to repeat the same line verbatim.
-			presence_penalty: persona.presence_penalty, //Number between -2.0 and 2.0. 
+			presence_penalty: presence_penalty, //Number between -2.0 and 2.0. 
 			//Positive values increase the model's likelihood 
 			//to talk about new topics.
 			stop: ["#", ";"], //Up to 4 sequences where the API will stop generating 
 			//further tokens. The returned text will not contain 
 			//the stop sequence.
 			functions: functionList,
-			messages: persona.conversationProtocal
+			messages: conversationProtocal
 		}
 
-		// add latest prompt to protocal
+		// add lattest prompt to protocal
 		if (funtionName) {
-			persona.conversationProtocal.push({
+			conversationProtocal.push({
 				"role": role,
 				"name": funtionName,
 				"content": sQuestion
 			});
 		} else {
-			persona.conversationProtocal.push({
+			conversationProtocal.push({
 				"role": role,
 				"content": sQuestion
 			});
 		}
-
-		//chat GPT-4 gpt-4
-		/*
-		if (sModel.indexOf("gpt-3.5-turbo") != -1) {
-			data = {
-				"messages": persona.conversationProtocal
-			}
-		}
-		*/
 
 		// TODO: need to fix error handling if there is too many tokens or no internet
 		try {

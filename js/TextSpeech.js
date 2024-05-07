@@ -1,4 +1,5 @@
-let bTextToSpeechSupported = false;
+let bTextToSpeechSupported = true;
+let TextToSpeechEnabled = false;
 let SpeechRecognitionOn = false;
 let bSpeechInProgress = false;
 let oSpeechRecognizer = null
